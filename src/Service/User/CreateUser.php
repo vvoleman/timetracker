@@ -6,6 +6,7 @@ use App\Entity\ApiToken;
 use App\Entity\User;
 use App\Repository\ApiTokenRepository;
 use App\Service\Util\LoggerAwareTrait;
+use Cassandra\Exception\AlreadyExistsException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;

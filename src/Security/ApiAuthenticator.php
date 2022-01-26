@@ -12,12 +12,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class ApiAuthenticator extends JsonLoginAuthenticator {
+class ApiAuthenticator extends AbstractAuthenticator {
 
     private ApiTokenRepository $repository;
 
@@ -25,8 +26,18 @@ class ApiAuthenticator extends JsonLoginAuthenticator {
         $this->repository = $repository;
     }
 
+    public function supports(Request $request): ?bool
+    {
+        if (false === strpos($request->getRequestFormat(), 'json') && false === strpos($request->getContentType(), 'json')) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function authenticate(Request $request): PassportInterface {
         $apiToken = $request->headers->get('X-AUTH-TOKEN');
+
         if (null === $apiToken) {
             // The token header was empty, authentication fails with HTTP Status
             // Code 401 "Unauthorized"
@@ -44,7 +55,7 @@ class ApiAuthenticator extends JsonLoginAuthenticator {
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response {
         return new JsonResponse([
-            'message'=> strtr($exception->getMessageKey(), $exception->getMessageData())
+            'message'=> "Invalid API token!"
         ],Response::HTTP_UNAUTHORIZED);
     }
 
