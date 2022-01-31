@@ -6,9 +6,7 @@ use App\Entity\ApiToken;
 use App\Entity\User;
 use App\Repository\ApiTokenRepository;
 use App\Service\Util\LoggerAwareTrait;
-use Cassandra\Exception\AlreadyExistsException;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface as Hasher;
 
@@ -33,6 +31,7 @@ class CreateUser {
         $data = new ArrayCollection($data);
 
         $user = new User();
+
         $user->setEmail($data->get('email'));
         $user->setPassword($this->hasher->hashPassword($user, $data->get("password")));
 
@@ -44,7 +43,6 @@ class CreateUser {
 
         $this->manager->persist($user);
         $this->manager->persist($token);
-
         try {
             $this->manager->flush();
         } catch (\Exception $e) {

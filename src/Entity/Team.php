@@ -6,6 +6,10 @@ use App\Repository\TeamRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV4;
 
 /**
  * @ORM\Entity(repositoryClass=TeamRepository::class)
@@ -14,34 +18,39 @@ class Team
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="uuid", unique=true)
+     * @Groups({"allTeam","publicTeam","publicUser","publicProject","publicEmployer"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"allTeam","publicTeam","publicUser","publicProject","publicEmployer"})
      */
     private $name;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="teams")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"allTeam","publicTeam"})
      */
     private $manager;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="teams")
+     * @Groups({"allTeam","publicTeam"})
      */
     private $members;
 
     /**
      * @ORM\OneToMany(targetEntity=Employer::class, mappedBy="madeBy")
+     * @Groups({"allTeam","publicTeam"})
      */
     private $employers;
 
     /**
      * @ORM\OneToMany(targetEntity=Project::class, mappedBy="team")
+     * @Groups({"allTeam","publicTeam"})
      */
     private $projects;
 
@@ -50,11 +59,12 @@ class Team
         $this->members = new ArrayCollection();
         $this->employers = new ArrayCollection();
         $this->projects = new ArrayCollection();
+        $this->id = Uuid::v4();
+
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
+    #[Pure] public function getId(): string {
+        return $this->id->toRfc4122();
     }
 
     public function getName(): ?string
@@ -82,7 +92,7 @@ class Team
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection
      */
     public function getMembers(): Collection
     {
@@ -106,7 +116,7 @@ class Team
     }
 
     /**
-     * @return Collection|Employer[]
+     * @return Collection
      */
     public function getEmployers(): Collection
     {
@@ -136,7 +146,7 @@ class Team
     }
 
     /**
-     * @return Collection|Project[]
+     * @return Collection
      */
     public function getProjects(): Collection
     {
@@ -164,4 +174,5 @@ class Team
 
         return $this;
     }
+
 }
