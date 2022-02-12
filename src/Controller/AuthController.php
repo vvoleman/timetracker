@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use App\Service\User\CreateUser;
 use App\Service\User\RetrieveUserToken;
 use App\Service\Util\ArraysTrait;
+use App\Service\Util\JsonRequest;
 use App\Service\Util\ResponseTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,20 +31,21 @@ class AuthController extends AbstractController {
 
     /**
      * <b>Login handler</b>
-     * @param Request $request
+     * @param JsonRequest $request
      * @param RetrieveUserToken $retrieve
      * @return Response
      * @throws \Exception
      */
     #[Route("/login", name: "_login", methods: ["POST"])]
-    public function login(Request $request, RetrieveUserToken $retrieve): Response {
+    public function login(JsonRequest $request, RetrieveUserToken $retrieve): Response {
         try {
-            $email = $request->request->get('email', '');
-            $token = $retrieve->getByCredentials($email, $request->request->get('password', ''));
+            $email = $request->get("email","");
+            $password = $request->get("password","");
+            $token = $retrieve->getByCredentials($email, $password);
 
             return $this->loginData($token);
         } catch (BadCredentialsException $e) {
-            return $this->error("Invalid Credentials", Response::HTTP_UNAUTHORIZED);
+            return $this->error($e->getMessage()." Invalid Credentials", Response::HTTP_UNAUTHORIZED);
         }
     }
 
@@ -56,7 +58,6 @@ class AuthController extends AbstractController {
      */
     #[Route("/register", name: "_register", methods: ["POST"])]
     public function register(Request $request, CreateUser $createUser): Response {
-
         try {
             $data = $this->doesExist($request->request->all(), ["email", "password"]);
             $user = $createUser->create($data);

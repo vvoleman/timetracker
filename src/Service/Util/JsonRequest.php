@@ -40,5 +40,12 @@ class JsonRequest {
         return $this->arrayData;
     }
 
+    public function get(string $key, string $default = null){
+        if(array_key_exists($key,$this->arrayData)){
+            return $this->arrayData[$key];
+        }
+        return $default;
+    }
+
 
 }

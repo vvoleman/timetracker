@@ -18,6 +18,7 @@ trait ResponseTrait {
         return new JsonResponse($data,$code);
     }
 
+
     /**
      * Returns data for login
      * @param ApiToken $token

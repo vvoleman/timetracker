@@ -58,7 +58,7 @@ class RetrieveUserToken {
             }
 
         }
-        throw new BadCredentialsException();
+        throw new BadCredentialsException("Couldn't find a user with these credentials!");
     }
 
 }

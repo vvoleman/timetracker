@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use App\Entity\User;
 use App\Repository\ApiTokenRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,10 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
@@ -21,17 +17,16 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 class ApiAuthenticator extends AbstractAuthenticator {
 
     private ApiTokenRepository $repository;
+    private const ANONYMOUS = "/^\/api\/auth/";
 
     public function __construct(ApiTokenRepository $repository) {
         $this->repository = $repository;
     }
 
-    public function supports(Request $request): ?bool
-    {
-        if (false === strpos($request->getRequestFormat(), 'json') && false === strpos($request->getContentType(), 'json')) {
+    public function supports(Request $request): ?bool {
+        if (preg_match(self::ANONYMOUS,$request->getPathInfo()) || (!str_contains($request->getRequestFormat(), 'json') && !str_contains($request->getContentType(), 'json'))) {
             return false;
         }
-
         return true;
     }
 
@@ -44,7 +39,7 @@ class ApiAuthenticator extends AbstractAuthenticator {
             throw new CustomUserMessageAuthenticationException('No API token provided');
         }
 
-        return new SelfValidatingPassport(new UserBadge($apiToken,function($token){
+        return new SelfValidatingPassport(new UserBadge($apiToken, function ($token) {
             return $this->repository->findUserByToken($token);
         }));
     }
@@ -55,8 +50,8 @@ class ApiAuthenticator extends AbstractAuthenticator {
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response {
         return new JsonResponse([
-            'message'=> "Invalid API token!"
-        ],Response::HTTP_UNAUTHORIZED);
+            'message' => "Invalid API token!"
+        ], Response::HTTP_UNAUTHORIZED);
     }
 
 //    public function start(Request $request, AuthenticationException $authException = null): Response
