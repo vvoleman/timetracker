@@ -1,0 +1,135 @@
+@import "layout/nav";
+
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #F1F3FB;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    &__right {
+        .user {
+            cursor: pointer;
+            img {
+                border-radius: 80rem;
+                object-fit: cover;
+            }
+            &__dropdown {
+                display: none;
+                &--visible {
+                    display: flex;
+                }
+            }
+        }
+    }
+}
+
+
+.users {
+    display: flex;
+    align-items: end;
+    gap: 2rem;
+    padding: 2rem 0;
+    &__item {
+
+        display: flex;
+        flex-direction: column;
+        background: white;
+        height: 7rem;
+        width: 5rem;
+        align-items: center;
+        justify-content: center;
+
+        padding: 2rem;
+
+        border-radius: 2rem;
+        box-shadow: 0px 1px 7px -5px #0000007a;
+
+        transition: .3s ease-in-out;
+        
+
+        text-decoration: none;
+        img {
+            border-radius: 80rem;
+        }
+
+        &:hover {
+            transform: scale(1.05)    
+        }
+
+        &--active {
+            background-color: #583D72;
+            color: white;
+        }
+
+        .user__name {
+            font-weight: 600;
+
+            font-size: 1.3em;
+
+            padding: .5rem 0 0 0 ;
+
+        }
+
+        .user__job {
+            font-size: .9rem;
+            padding-bottom: 1rem;
+        }
+    
+    }
+}
+
+.main {
+    padding: 2rem 2rem;
+    margin-left: 10rem;
+}
+
+
+.tracker {
+    &__wrapper {
+        display: flex;
+        justify-content: space-around;
+    }
+    &__item {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        padding: 2rem 5rem;
+        box-shadow: 0px 1px 7px -5px #0000007a;
+        background-color: white;
+        border-radius: .5rem;
+        position: relative;
+        span {
+            &:first-child {
+                font-size: 2rem;
+            }
+            &:nth-child(2) {
+                color: #b1b1b1;
+            }
+        }
+        .actions {
+            position: absolute;
+            right: 4rem;
+            top:.8rem;
+        }
+    }
+
+    &__info {
+        display: none;
+    }
+
+    &__header {
+        margin-bottom: 1.2rem;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+}
