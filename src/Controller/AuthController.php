@@ -57,9 +57,9 @@ class AuthController extends AbstractController {
      * @return Response
      */
     #[Route("/register", name: "_register", methods: ["POST"])]
-    public function register(Request $request, CreateUser $createUser): Response {
+    public function register(JsonRequest $request, CreateUser $createUser): Response {
         try {
-            $data = $this->doesExist($request->request->all(), ["email", "password"]);
+            $data = $this->doesExist($request->getDataAsArray(), ["email", "password"]);
             $user = $createUser->create($data);
         } catch (\InvalidArgumentException $e) {
             return $this->error($e->getMessage(), Response::HTTP_UNAUTHORIZED);
